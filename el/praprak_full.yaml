@@ -1,0 +1,14 @@
+# Prapraktikum 5 — Sling Full-Refresh (2 Tabel: customers & orders)
+# Contoh untuk `public.customers` sudah diberikan di bawah.
+# TODO: Tambahkan stream `public.orders` agar ikut disalin ke `raw.orders`.
+
+source: POSTGRES_OLTP
+target: DUCKDB_DWH
+
+defaults:
+  mode: full-refresh
+  object: 'raw.{stream_table}'
+
+streams:
+  public.customers:
+  # TODO

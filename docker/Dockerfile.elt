@@ -1,0 +1,28 @@
+FROM debian:bookworm-slim
+
+ARG TARGETARCH
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+     curl \
+     unzip \
+     ca-certificates \
+     postgresql-client \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install Sling CLI
+RUN SLING_ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "arm64" || echo "amd64") \
+  && curl -fSL -o /tmp/sling.tar.gz "https://github.com/slingdata-io/sling-cli/releases/latest/download/sling_linux_${SLING_ARCH}.tar.gz" \
+  && tar -xzf /tmp/sling.tar.gz -C /usr/local/bin sling \
+  && chmod +x /usr/local/bin/sling \
+  && rm -f /tmp/sling.tar.gz
+
+# Install DuckDB CLI v1.1.3
+RUN DUCK_ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "aarch64" || echo "amd64") \
+  && curl -fSL -o /tmp/duckdb.zip "https://github.com/duckdb/duckdb/releases/download/v1.1.3/duckdb_cli-linux-${DUCK_ARCH}.zip" \
+  && unzip /tmp/duckdb.zip -d /usr/local/bin \
+  && chmod +x /usr/local/bin/duckdb \
+  && rm -f /tmp/duckdb.zip
+
+WORKDIR /work
+CMD ["sleep", "infinity"]

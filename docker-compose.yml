@@ -1,0 +1,36 @@
+services:
+  postgres-oltp:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: basdat
+      POSTGRES_PASSWORD: basdat123
+      POSTGRES_DB: basdat_oltp
+    ports:
+      - "5434:5432" # kalo 5433 masih bentrok, coba port 5434
+    volumes:
+      - pg_oltp_data:/var/lib/postgresql/data
+      - ./source:/opt/source:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U basdat -d basdat_oltp"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  elt-runner:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.elt
+    depends_on:
+      postgres-oltp:
+        condition: service_healthy
+    environment:
+      POSTGRES_OLTP: "postgresql://basdat:basdat123@postgres-oltp:5432/basdat_oltp"
+      DUCKDB_DWH: "duckdb:///work/data/basdat_dwh.duckdb"
+      DWH_DUCKDB_FILE: "/work/data/basdat_dwh.duckdb"
+    volumes:
+      - ./:/work
+    working_dir: /work
+    command: ["sleep", "infinity"]
+
+volumes:
+  pg_oltp_data:

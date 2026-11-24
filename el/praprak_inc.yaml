@@ -1,0 +1,22 @@
+# Prapraktikum 5 — Sling Incremental & Idempotency (2 Tabel: customers & orders)
+# Dokumentasi Sling: https://docs.slingdata.io/concepts/replication
+#
+# TODO:
+# Konfigurasikan replikasi untuk tabel `public.customers` dan `public.orders` ke `raw.*` agar:
+# 1. Hanya menarik baris baru atau baris yang berubah sejak tarikan terakhir (bukan full-refresh).
+# 2. Menimpa (upsert) baris lama yang berubah tanpa menciptakan duplikat saat dijalankan berulang kali.
+#    (Periksa kembali struktur kolom & Primary Key masing-masing tabel di PostgreSQL!)
+
+source: POSTGRES_OLTP
+target: DUCKDB_DWH
+
+defaults:
+  object: 'raw.{stream_table}'
+  # TODO: tambahkan pengaturan strategi pemuatan inkremental di sini
+
+streams:
+  public.customers:
+    # TODO
+
+  public.orders:
+    # TODO
